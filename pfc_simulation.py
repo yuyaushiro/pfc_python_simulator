@@ -1,5 +1,6 @@
 from modules.world import World, Landmark, Map, Goal
 from modules.robot import IdealRobot
+from modules.agent import Agent
 
 import numpy as np
 
@@ -20,8 +21,10 @@ if __name__ == "__main__":
     ### ロボットを作る ###
     # 初期位置
     init_pose = np.array([-1.5, -0.5, 0])
+    # エージェント
+    agent = Agent(0.1, 0.5)
     # ロボット
-    robot = IdealRobot(init_pose, sensor=None, agent=None)
+    robot = IdealRobot(init_pose, sensor=None, agent=agent)
     world.append(robot)
 
     world.draw()
