@@ -43,3 +43,44 @@ class World:
         for obj in self.objects:
             obj.draw(ax, elems)
             if hasattr(obj, "one_step"): obj.one_step(self.time_interval)
+
+
+# ランドマーククラス
+class Landmark:
+    def __init__(self, x, y):
+        self.pos = np.array([x, y]).T
+        self.id = None
+
+    def draw(self, ax, elems):
+        c = ax.scatter(self.pos[0], self.pos[1], s=100, marker="*", label="landmarks", color="orange")
+        elems.append(c)
+        elems.append(ax.text(self.pos[0], self.pos[1], "id:" + str(self.id), fontsize=10))
+
+
+# ランドマーク管理のクラス
+class Map:
+    def __init__(self):
+        self.landmarks = []
+
+    def append_landmark(self, landmark):
+        landmark.id = len(self.landmarks)
+        self.landmarks.append(landmark)
+
+    def draw(self, ax, elems):
+        for lm in self.landmarks: lm.draw(ax, elems)
+
+
+class Goal:
+    def __init__(self, x, y, radius=0.3, value=0.0):
+        self.pos = np.array([x, y]).T
+        self.radius = radius
+        self.value = value
+
+    def inside(self, pose):
+        return self.radius > math.sqrt( (self.pos[0]-pose[0])**2 + (self.pos[1]-pose[1])**2 )
+
+    def draw(self, ax, elems):
+        x, y = self.pos
+        c = ax.scatter(x + 0.16, y + 0.5, s=50, marker=">", label="landmarks", color="red")
+        elems.append(c)
+        elems += ax.plot([x, x], [y, y + 0.6], color="black")
