@@ -19,26 +19,6 @@ class Particle:
         # 適当な数値
         self.max_avoid_weight = 1/weight
 
-    def increase_avoid_weight(self, time_interval):
-        self.is_avoiding = True
-        self.avoid_elapsed_time = 0.0
-        self.avoid_weight += self.max_avoid_weight/1 * time_interval
-        if self.avoid_weight >= self.max_avoid_weight:
-            self.avoid_weight = self.max_avoid_weight
-
-    def decrease_avoid_weight(self, time_interval):
-        # 回避行動中だったら
-        if self.is_avoiding:
-            # 一定秒数重み維持
-            if self.avoid_elapsed_time < self.avoid_time:
-                self.avoid_elapsed_time += time_interval
-            else:
-                decrease_num = self.max_avoid_weight/3 * time_interval
-                self.avoid_weight -= decrease_num
-                if self.avoid_weight < 1.0:
-                    self.avoid_weight = 1.0
-                    self.is_avoiding = False
-
     def motion_update(self, nu, omega, time, noise_rate_pdf):
         ns = noise_rate_pdf.rvs()
         pnu = nu + ns[0]*math.sqrt(abs(nu)/time) + ns[1]*math.sqrt(abs(omega)/time)
