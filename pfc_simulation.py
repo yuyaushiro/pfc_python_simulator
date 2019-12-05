@@ -13,7 +13,7 @@ import numpy as np
 if __name__ == "__main__":
     time_interval = 0.1
     world = World(100, time_interval,
-                  Recorder(time_interval, "aaa", playback_speed=3),
+                #   Recorder(time_interval, "aaa", playback_speed=3),
                   drawing_range=[-2.5, 2.5])
 
     ### ランドマーク ###

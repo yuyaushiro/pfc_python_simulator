@@ -48,7 +48,8 @@ class World:
         while elems: elems.pop().remove()
         time_str = "t = %.2f[s]" % (self.time_interval*i)
         if self.recorder is not None: print(time_str)
-        elems.append(ax.text(-4.4, 4.5, time_str, fontsize=10))
+        dr = self.drawing_range
+        elems.append(ax.text(dr[0]*0.9, dr[1]*0.9, time_str, fontsize=10))
         for obj in self.objects:
             obj.draw(ax, elems)
             if hasattr(obj, "one_step"): obj.one_step(self.time_interval)
