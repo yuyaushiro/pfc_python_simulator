@@ -1,6 +1,7 @@
 from modules.world import World, Landmark, Map, Goal
 from modules.robot import IdealRobot
-from modules.agent import Agent
+from modules.agent import Agent, EstimationAgent
+from modules.sensor import Camera
 
 import numpy as np
 
@@ -23,8 +24,10 @@ if __name__ == "__main__":
     init_pose = np.array([-1.5, -0.5, 0])
     # エージェント
     agent = Agent(0.1, 0.5)
+    # センサ
+    camera = Camera(m)
     # ロボット
-    robot = IdealRobot(init_pose, sensor=None, agent=agent)
+    robot = IdealRobot(init_pose, sensor=camera, agent=agent)
     world.append(robot)
 
     world.draw()
