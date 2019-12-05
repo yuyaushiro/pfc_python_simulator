@@ -12,13 +12,6 @@ class Particle:
         self.pose = init_pose
         self.weight = weight
 
-        self.is_avoiding = False
-        self.avoid_weight = 1.0
-        self.avoid_time = 3.0
-        self.avoid_elapsed_time = 0.0
-        # 適当な数値
-        self.max_avoid_weight = 1/weight
-
     def motion_update(self, nu, omega, time, noise_rate_pdf):
         ns = noise_rate_pdf.rvs()
         pnu = nu + ns[0]*math.sqrt(abs(nu)/time) + ns[1]*math.sqrt(abs(omega)/time)
