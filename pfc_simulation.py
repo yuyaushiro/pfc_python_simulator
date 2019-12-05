@@ -5,13 +5,16 @@ from modules.sensor import Camera
 from modules.mcl import Mcl
 from modules.grid_map import GridMap
 from modules.pfc import Pfc
+from modules.recorder import Recorder
 
 import numpy as np
 
 
 if __name__ == "__main__":
     time_interval = 0.1
-    world = World(100, time_interval, drawing_range=[-5, 5])
+    world = World(100, time_interval,
+                  Recorder(time_interval, "aaa", playback_speed=3),
+                  drawing_range=[-2.5, 2.5])
 
     ### ランドマーク ###
     m = Map()
@@ -29,7 +32,7 @@ if __name__ == "__main__":
     # 初期位置
     init_pose = np.array([-1.5, -1.5, 0])
     # 初期位置のばらつき
-    init_pose_stds = np.array([0.2, 0.2, 0.1])
+    init_pose_stds = np.array([0.1, 0.1, 0.05])
     # 動作のばらつき
     motion_noise_stds = {"nn":0.03, "no":0.03, "on":0.03, "oo":0.03}
 

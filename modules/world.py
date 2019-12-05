@@ -1,3 +1,5 @@
+from modules.recorder import Recorder
+
 import matplotlib
 import matplotlib.animation as anm
 import matplotlib.pyplot as plt
@@ -9,11 +11,14 @@ import datetime
 
 # 世界
 class World:
-    def __init__(self, time_span, time_interval, drawing_range=[-5, 5]):
+    def __init__(self, time_span, time_interval,
+                 recorder=None,
+                 drawing_range=[-5, 5]):
         self.objects = []
         self.time_span = time_span
         self.time_interval = time_interval
         self.drawing_range = drawing_range
+        self.recorder = recorder
 
     # 世界にオブジェクトを追加する
     def append(self,obj):
@@ -33,12 +38,16 @@ class World:
 
         self.ani = anm.FuncAnimation(fig, self.one_step, fargs=(elems, ax),
                                     frames=int(self.time_span/self.time_interval)+1, interval=int(self.time_interval*1000), repeat=False)
-        plt.show()
+        if self.recorder is None:
+            plt.show()
+        else:
+            self.recorder.record(self.ani)
 
     # 世界を 1 ステップ進める
     def one_step(self, i, elems, ax):
         while elems: elems.pop().remove()
         time_str = "t = %.2f[s]" % (self.time_interval*i)
+        if self.recorder is not None: print(time_str)
         elems.append(ax.text(-4.4, 4.5, time_str, fontsize=10))
         for obj in self.objects:
             obj.draw(ax, elems)
