@@ -21,7 +21,7 @@ class EstimationAgent:
         self.prev_nu = 0.0
         self.prev_omega = 0.0
 
-    def make_decision(self, observation=None):
+    def make_decision(self, pose, observation=None):
         self.estimator.motion_update(self.prev_nu, self.prev_omega, self.time_interval)
         self.prev_nu, self.prev_omega = self.nu, self.omega
         self.estimator.observation_update(observation)
