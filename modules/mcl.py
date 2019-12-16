@@ -1,5 +1,7 @@
 from modules.robot import IdealRobot
 from modules.sensor import IdealCamera
+from modules.avoidance import Avoidance
+
 from scipy.stats import multivariate_normal
 import numpy as np
 import math
@@ -11,6 +13,7 @@ class Particle:
     def __init__(self, init_pose, weight):
         self.pose = init_pose
         self.weight = weight
+        self.avoidance = Avoidance()
 
     def motion_update(self, nu, omega, time, noise_rate_pdf):
         ns = noise_rate_pdf.rvs()

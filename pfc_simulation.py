@@ -30,14 +30,14 @@ if __name__ == "__main__":
 
     ### ロボットを作る ###
     # 初期位置
-    init_pose = np.array([-1.5, -1.5, 0])
+    init_pose = np.array([-1.5, -0.5, 0])
     # 初期位置のばらつき
     init_pose_stds = np.array([0.1, 0.1, 0.05])
     # 動作のばらつき
-    motion_noise_stds = {"nn":0.03, "no":0.03, "on":0.03, "oo":0.03}
+    motion_noise_stds = {"nn":0.02, "no":0.02, "on":0.02, "oo":0.02}
 
     # 推定器
-    estimator = Mcl(m, init_pose, 100, motion_noise_stds=motion_noise_stds,
+    estimator = Mcl(m, init_pose, 2, motion_noise_stds=motion_noise_stds,
                     init_pose_stds=init_pose_stds)
     # エージェント
     agent = Pfc(time_interval, 0.1, 0.5, estimator, grid_map, goal, magnitude=3)

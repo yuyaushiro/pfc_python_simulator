@@ -56,14 +56,19 @@ class DynamicProgramming:
         return max_delta
 
     def action_value(self, action, index): #はみ出しペナルティー追加
-        value = 0.0
+        value_n = 0.0
+        reward = 0.0
         for delta, prob in self.state_transition_probs[(action, index[2])]:
             after, edge_reward = self.edge_correction(np.array(index).T + delta)
             after = tuple(after)
-            reward = - self.time_interval - (self.map_image[after[0], after[1]]<10)*100*self.time_interval + edge_reward
-            value += (self.value_function[after] + reward) * prob
+            reward += -(self.time_interval\
+                        +(self.map_image[after[0], after[1]]<10)*100*self.time_interval\
+                        -edge_reward) * prob
+            value_n += self.value_function[after] * prob
 
-        return value
+        action_value = value_n + reward
+
+        return action_value, value_n, reward
 
     def edge_correction(self, index): #変更
         edge_reward = 0.0

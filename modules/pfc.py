@@ -32,7 +32,7 @@ class Pfc:
         # 積極度
         self.magnitude = magnitude
 
-        self.dp = DynamicProgramming(grid_map.map_data, grid_map.resolution, goal,
+        self.dp = DynamicProgramming(grid_map.map_image, grid_map.resolution, goal,
                                      0.1, 10, value=grid_map.value_data)
         self.history = [(0, 0)]
 
@@ -52,6 +52,7 @@ class Pfc:
     def calc_policy(self):
         indexes = [self.grid_map.to_index(p.pose) for p in self.estimator.particles]
         self.evaluations = [self.evaluate(a, indexes) for a in self.actions]
+        for p in self.estimator.particles: p.avoidance.decrease_weight(self.time_interval)
 
         self.history.append(self.actions[np.argmax(self.evaluations)])
         if self.history[-1][0] + self.history[-2][0] == 0.0 and self.history[-1][1] + self.history[-2][1] == 0.0:
@@ -63,10 +64,14 @@ class Pfc:
         v = self.dp.value_function
         # 分母
         vs = [abs(v[i]) if abs(v[i]) > 0.0 else 1e-10 for i in indexes]
-        # 分子
+        # 価値関数
         qs = [self.dp.action_value(action, i) for i in indexes]
+        for (q, p) in zip(qs, self.estimator.particles):
+            # 行動次第で水たまりに入りそうな場合
+            if q[2] < -5:
+                p.avoidance.increase_weight(self.time_interval)
 
-        return sum([q/(v**self.magnitude) for (v, q) in zip(vs, qs)])
+        return sum([((q[1] + q[2])/p.avoidance.weight)/(v**self.magnitude) for (v, q, p) in zip(vs, qs, self.estimator.particles)])
 
     def estimate_state(self, estimator, observation):
         estimator.motion_update(self.prev_nu, self.prev_omega, self.time_interval)
