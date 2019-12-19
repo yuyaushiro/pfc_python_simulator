@@ -13,7 +13,7 @@ import numpy as np
 if __name__ == "__main__":
     time_interval = 0.1
     world = World(100, time_interval,
-                #   Recorder(time_interval, "aaa", playback_speed=3),
+                  Recorder(time_interval, "pfc_avoid", playback_speed=3),
                   drawing_range=[-2.5, 2.5])
 
     ### ランドマーク ###
@@ -30,17 +30,17 @@ if __name__ == "__main__":
 
     ### ロボットを作る ###
     # 初期位置
-    init_pose = np.array([-1.5, -0.5, 0])
+    init_pose = np.array([-1.5, 0.5, 0.0])
     # 初期位置のばらつき
-    init_pose_stds = np.array([0.1, 0.1, 0.05])
+    init_pose_stds = np.array([0.05, 0.05, 0.05])
     # 動作のばらつき
-    motion_noise_stds = {"nn":0.02, "no":0.02, "on":0.02, "oo":0.02}
+    motion_noise_stds = {"nn":0.03, "no":0.03, "on":0.03, "oo":0.03}
 
     # 推定器
-    estimator = Mcl(m, init_pose, 2, motion_noise_stds=motion_noise_stds,
+    estimator = Mcl(m, init_pose, 100, motion_noise_stds=motion_noise_stds,
                     init_pose_stds=init_pose_stds)
     # エージェント
-    agent = Pfc(time_interval, 0.1, 0.5, estimator, grid_map, goal, magnitude=3)
+    agent = Pfc(time_interval, 0.1, 0.5, estimator, grid_map, goal, magnitude=2)
     # ロボット
     robot = IdealRobot(init_pose, sensor=Camera(m), agent=agent)
     world.append(robot)

@@ -52,26 +52,35 @@ class Pfc:
     def calc_policy(self):
         indexes = [self.grid_map.to_index(p.pose) for p in self.estimator.particles]
         self.evaluations = [self.evaluate(a, indexes) for a in self.actions]
-        for p in self.estimator.particles: p.avoidance.decrease_weight(self.time_interval)
 
-        self.history.append(self.actions[np.argmax(self.evaluations)])
-        if self.history[-1][0] + self.history[-2][0] == 0.0 and self.history[-1][1] + self.history[-2][1] == 0.0:
-            return (self.nu, 0.0)
-        return self.history[-1]
-        # return self.actions[np.argmax(self.evaluations)]
+        # self.history.append(self.actions[np.argmax(self.evaluations)])
+        # if self.history[-1][0] + self.history[-2][0] == 0.0 and self.history[-1][1] + self.history[-2][1] == 0.0:
+        #     return (self.nu, 0.0)
+        # return self.history[-1]
+        action_index = np.argmax(self.evaluations)
+
+        # 回避重みを決定する
+        for p in self.estimator.particles:
+            p.avoidance.determine_weight(action_index)
+
+        return self.actions[action_index]
 
     def evaluate(self, action, indexes):
         v = self.dp.value_function
         # 分母
         vs = [abs(v[i]) if abs(v[i]) > 0.0 else 1e-10 for i in indexes]
-        # 価値関数
+        # 分子
         qs = [self.dp.action_value(action, i) for i in indexes]
-        for (q, p) in zip(qs, self.estimator.particles):
-            # 行動次第で水たまりに入りそうな場合
-            if q[2] < -5:
-                p.avoidance.increase_weight(self.time_interval)
+        avoidance_ms = []
+        for (p, q) in zip(self.estimator.particles, qs):
+            p.avoidance.weight_candidate_append(q[2])
+            print(p.avoidance.weight, p.avoidance.weight_candidates[-1])
+            avoidance_ms.append(max([p.avoidance.weight,
+                                     p.avoidance.weight_candidates[-1]]))
 
-        return sum([((q[1] + q[2])/p.avoidance.weight)/(v**self.magnitude) for (v, q, p) in zip(vs, qs, self.estimator.particles)])
+        q_pfc = sum([( (q[1]-q[2]) * am )\
+                     /( v**self.magnitude ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        return q_pfc
 
     def estimate_state(self, estimator, observation):
         estimator.motion_update(self.prev_nu, self.prev_omega, self.time_interval)
@@ -80,6 +89,9 @@ class Pfc:
         for p in self.estimator.particles:
             if self.goal.inside(p.pose): p.weight *= 1e-10
         self.estimator.resampling()
+
+        for p in self.estimator.particles:
+            p.avoidance.decrease_weight(self.time_interval)
 
     def draw(self, ax, elems):
         # 推定器の描画
