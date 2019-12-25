@@ -13,7 +13,7 @@ class Particle:
     def __init__(self, init_pose, weight):
         self.pose = init_pose
         self.weight = weight
-        self.avoidance = Avoidance()
+        self.avoidance = Avoidance(1/weight)
 
     def motion_update(self, nu, omega, time, noise_rate_pdf):
         ns = noise_rate_pdf.rvs()
@@ -93,9 +93,33 @@ class Mcl:
         for p in self.particles: p.weight = 1.0/len(self.particles)
 
     def draw(self, ax, elems):
-        xs = [p.pose[0] for p in self.particles]
-        ys = [p.pose[1] for p in self.particles]
-        vxs = [math.cos(p.pose[2])*p.weight*len(self.particles) for p in self.particles]
-        vys = [math.sin(p.pose[2])*p.weight*len(self.particles) for p in self.particles]
+        # xs = [p.pose[0] for p in self.particles]
+        # ys = [p.pose[1] for p in self.particles]
+        # vxs = [math.cos(p.pose[2])*p.weight*len(self.particles) for p in self.particles]
+        # vys = [math.sin(p.pose[2])*p.weight*len(self.particles) for p in self.particles]
+        # elems.append(ax.quiver(xs, ys, vxs, vys, angles='xy', scale_units='xy',
+        #                        color="blue", alpha=0.5))
+        xs = []
+        ys = []
+        vxs = []
+        vys = []
+        for p in self.particles:
+            if p.avoidance.weight == p.avoidance.min_weight:
+                xs.append(p.pose[0])
+                ys.append(p.pose[1])
+                vxs.append(math.cos(p.pose[2])*p.weight*len(self.particles))
+                vys.append(math.sin(p.pose[2])*p.weight*len(self.particles))
         elems.append(ax.quiver(xs, ys, vxs, vys, angles='xy', scale_units='xy',
                                color="blue", alpha=0.5))
+        xs = []
+        ys = []
+        vxs = []
+        vys = []
+        for p in self.particles:
+            if p.avoidance.weight > p.avoidance.min_weight:
+                xs.append(p.pose[0])
+                ys.append(p.pose[1])
+                vxs.append(math.cos(p.pose[2])*p.weight*len(self.particles))
+                vys.append(math.sin(p.pose[2])*p.weight*len(self.particles))
+        elems.append(ax.quiver(xs, ys, vxs, vys, angles='xy', scale_units='xy',
+                               color="red", alpha=0.5))

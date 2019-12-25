@@ -52,18 +52,19 @@ class Pfc:
     def calc_policy(self):
         indexes = [self.grid_map.to_index(p.pose) for p in self.estimator.particles]
         self.evaluations = [self.evaluate(a, indexes) for a in self.actions]
+        print(self.evaluations)
 
-        # self.history.append(self.actions[np.argmax(self.evaluations)])
-        # if self.history[-1][0] + self.history[-2][0] == 0.0 and self.history[-1][1] + self.history[-2][1] == 0.0:
-        #     return (self.nu, 0.0)
-        # return self.history[-1]
         action_index = np.argmax(self.evaluations)
 
         # 回避重みを決定する
         for p in self.estimator.particles:
             p.avoidance.determine_weight(action_index)
 
-        return self.actions[action_index]
+        # return self.actions[action_index]
+        self.history.append(self.actions[action_index])
+        if self.history[-1][0] + self.history[-2][0] == 0.0 and self.history[-1][1] + self.history[-2][1] == 0.0:
+            return (self.nu, 0.0)
+        return self.history[-1]
 
     def evaluate(self, action, indexes):
         v = self.dp.value_function
@@ -74,12 +75,12 @@ class Pfc:
         avoidance_ms = []
         for (p, q) in zip(self.estimator.particles, qs):
             p.avoidance.weight_candidate_append(q[2])
-            print(p.avoidance.weight, p.avoidance.weight_candidates[-1])
             avoidance_ms.append(max([p.avoidance.weight,
                                      p.avoidance.weight_candidates[-1]]))
 
-        q_pfc = sum([( (q[1]-q[2]) * am )\
-                     /( v**self.magnitude ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        # q_pfc = sum([(q[0] / (abs(v)**self.magnitude) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        # q_pfc = sum([(q[0] / (abs(v)**self.magnitude) )*am  for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        q_pfc = sum([(q[0] / (abs(v)**(self.magnitude-am)) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
         return q_pfc
 
     def estimate_state(self, estimator, observation):
