@@ -12,8 +12,9 @@ import numpy as np
 
 if __name__ == "__main__":
     time_interval = 0.1
-    world = World(120, time_interval,
-                #   Recorder(time_interval, "avoid1000", playback_speed=3),
+    world = World(60, time_interval,
+                  # Recorder(time_interval, "avoid10_time0-10", playback_speed=3),
+                  # Recorder(time_interval, "no-avoid", playback_speed=3),
                   drawing_range=[-2.5, 2.5])
 
     ### ランドマーク ###
@@ -30,16 +31,14 @@ if __name__ == "__main__":
 
     ### ロボットを作る ###
     # 初期位置
-    # init_pose = np.array([-2.3, 0.5, 0.0])
-    init_pose = np.array([-1.0, -0.3, 0.0])
+    init_pose = np.array([-1.5, -0.75, 0.0])
     # 初期位置のばらつき
-    # init_pose_stds = np.array([0.1, 0.05, 0.01])
-    init_pose_stds = np.array([0.2, 0.02, 0.02])
+    init_pose_stds = np.array([0.15, 0.15, 0.02])
     # 動作のばらつき
     motion_noise_stds = {"nn":0.02, "no":0.02, "on":0.02, "oo":0.02}
 
     # 推定器
-    estimator = Mcl(m, init_pose, 300, motion_noise_stds=motion_noise_stds,
+    estimator = Mcl(m, init_pose, 1000, motion_noise_stds=motion_noise_stds,
                     init_pose_stds=init_pose_stds)
     # エージェント
     agent = Pfc(time_interval, 0.1, 0.5, estimator, grid_map, goal, magnitude=2)

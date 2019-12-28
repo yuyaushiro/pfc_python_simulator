@@ -3,7 +3,7 @@ class Avoidance:
         self.weight = 0.0
         self.time = 0.0
         self.elapsed_time = 0.0
-        self.max_weight = 6.0
+        self.max_weight = 10.0
         self.min_weight = 0.0
         # self.max_weight = n * 1000
         self.weight_candidates = []
@@ -16,7 +16,7 @@ class Avoidance:
             if self.elapsed_time < self.time:
                 self.elapsed_time += time_interval
             else:
-                self.weight -= (self.max_weight-self.min_weight)/0.1 * time_interval
+                self.weight -= (self.max_weight-self.min_weight)/10.0* time_interval
                 if self.weight < self.min_weight:
                     self.weight = self.min_weight
 

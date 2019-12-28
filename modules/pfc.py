@@ -78,9 +78,9 @@ class Pfc:
             avoidance_ms.append(max([p.avoidance.weight,
                                      p.avoidance.weight_candidates[-1]]))
 
-        # q_pfc = sum([(q[0] / (abs(v)**self.magnitude) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
-        # q_pfc = sum([(q[0] / (abs(v)**self.magnitude) )*am  for (v, q, am) in zip(vs, qs, avoidance_ms)])
-        q_pfc = sum([(q[0] / (abs(v)**(self.magnitude-am)) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        q_pfc = sum([(q[0] / (abs(v)**self.magnitude) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+        # q_pfc = sum([(q[0] / (abs(v)**(self.magnitude-am)) ) for (v, q, am) in zip(vs, qs, avoidance_ms)])
+
         return q_pfc
 
     def estimate_state(self, estimator, observation):
